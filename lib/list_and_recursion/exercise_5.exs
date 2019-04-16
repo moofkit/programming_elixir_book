@@ -14,20 +14,18 @@ defmodule MyEnum do
     each(tail, fun)
   end
 
-  def filter([], _fun), do: []
+  def filter(list, fun, acc \\ [])
+  def filter([], _fun, acc), do: Enum.reverse(acc)
 
-  def filter([head | tail], fun) do
-    [
-      if fun.(head) do
-        head
-      else
-        nil
-      end
-      | filter(tail, fun)
-    ]
+  def filter([head | tail], fun, acc) do
+    if fun.(head) do
+      filter(tail, fun, [head | acc])
+    else
+      filter(tail, fun, acc)
+    end
   end
 end
 
 IO.puts(MyEnum.all?([2, 4, 6], &Integer.is_even/1) == true)
 MyEnum.each(["hello", "world"], fn word -> IO.puts(word) end)
-IO.puts(inspect(MyEnum.filter([1, 2, 3, 4, 5], &(&1 > 3))))
+IO.puts(MyEnum.filter([1, 2, 3, 4, 5], &Integer.is_even/1) == [2, 4])
